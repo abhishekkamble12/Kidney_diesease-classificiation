@@ -1,0 +1,11 @@
+tensorflow 
+pandas 
+numpy 
+dvc 
+mlflow 
+matplotlib
+seaborn 
+joblib
+types-PyYAML
+scipy
+Fastapi
