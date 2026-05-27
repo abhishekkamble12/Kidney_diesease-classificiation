@@ -17,5 +17,5 @@ dagshub
 python-dotenv
 transformers
 huggingface-hub
-transformers
+xgboost
 -e .

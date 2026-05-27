@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict, Any
 
 @dataclass(frozen=True)
 class DataIngestionConfig:
@@ -26,12 +27,9 @@ class ModelTrainerConfig:
     train_data_path: Path
     test_data_path: Path
     model_name: str
-    epochs: int
-    batch_size: int
-    learning_rate: float
+    random_state: int
     max_features: int
-    embedding_dim: int
-    max_len: int
+    hyperparams: Dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -43,3 +41,5 @@ class ModelEvaluationConfig:
     threshold: float
     stage: str
     model_name: str
+    random_state: int
+    hyperparams: Dict[str, Any]

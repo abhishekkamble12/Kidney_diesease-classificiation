@@ -5,7 +5,7 @@ environment: "development"
 # data ingestion 
 data_ingestion :
   root_dir: artifacts/data_ingestion
-  source_URL: D:\DL_proj\Kidney_diesease-classificiation\dataset\thoroughly_cleaned_data.csv
+  source_URL: Kidney_diesease-classificiation/dataset/thoroughly_cleaned_data.csv
   local_data_file: kidney_disease.csv
   unzip_dir: artifacts/data_ingestion 
   source_type : url 
