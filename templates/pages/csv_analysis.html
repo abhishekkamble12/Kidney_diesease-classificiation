@@ -1,0 +1,314 @@
+<!-- templates/pages/csv_analysis.html -->
+{% extends "layouts/base.html" %}
+{% from 'components/metric_card.html' import metric_card %}
+{% from 'components/charts.html' import chart_container %}
+
+{% block title %}AI Analytics | CSV Bulk Analysis{% endblock %}
+{% block header_title %}Bulk CSV Analytics{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="csvApp()">
+    
+    <!-- Upload Zone -->
+    <div class="glass-card p-10 text-center relative overflow-hidden transition-all duration-300" 
+         :class="isDragging ? 'border-indigo-500 bg-indigo-500/10' : 'border-dashed border-slate-700 hover:border-slate-500'"
+         @dragover.prevent="isDragging = true"
+         @dragleave.prevent="isDragging = false"
+         @drop.prevent="handleDrop($event)">
+        
+        <input type="file" id="csv-upload" accept=".csv" class="hidden" @change="handleFileSelect($event)">
+        
+        <div class="mx-auto w-16 h-16 mb-4 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 group-hover:text-indigo-400 group-hover:bg-indigo-500/10 transition-all">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+        </div>
+        
+        <h3 class="text-xl font-bold text-white mb-2">Upload Enterprise Dataset</h3>
+        <p class="text-slate-400 mb-6">Drag and drop your CSV file here, or click to browse.</p>
+        
+        <button @click="document.getElementById('csv-upload').click()" class="btn-primary" :disabled="isUploading">
+            <span x-show="!isUploading">Browse Files</span>
+            <span x-show="isUploading">{% include 'components/loader.html' %}</span>
+        </button>
+
+        <div x-show="error" style="display:none;" class="mt-4 text-sm text-rose-400 font-medium">
+            <span x-text="error"></span>
+        </div>
+    </div>
+
+    <!-- Validation & Results Section -->
+    <div x-show="hasResults" style="display: none;" x-transition>
+        
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-4 mb-6">
+            <button class="btn-secondary text-sm flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Export Analytics
+            </button>
+            <button class="btn-primary text-sm flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Download AI Report
+            </button>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {{ metric_card('Total Processed', '<span x-text="stats.total"></span>', '<svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>', 'indigo-400', 'Rows detected') }}
+            {{ metric_card('Positive Sentiment', '<span x-text="stats.positivePercent + \'%\'"></span>', '<svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path></svg>', 'emerald-400') }}
+            {{ metric_card('Negative Sentiment', '<span x-text="stats.negativePercent + \'%\'"></span>', '<svg class="w-6 h-6 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"></path></svg>', 'rose-400') }}
+            {{ metric_card('Avg Confidence', '<span x-text="stats.avgConfidence + \'%\'"></span>', '<svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>', 'cyan-400') }}
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- Sentiment Distribution Chart -->
+            {{ chart_container('sentimentChart', 'Sentiment Distribution') }}
+            
+            <!-- Confidence Distribution Chart -->
+            {{ chart_container('confidenceChart', 'Confidence Distribution') }}
+        </div>
+
+        <!-- LLM Generative Report Panel -->
+        <div class="glass-card p-6 mb-6 relative overflow-hidden" x-show="report" x-transition>
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none"></div>
+            
+            <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                AI Bulk Analysis Report
+            </h3>
+            
+            <div class="space-y-6 text-sm text-slate-300">
+                <!-- Sentiment Report -->
+                <div>
+                    <h4 class="text-indigo-300 font-semibold mb-2 border-l-2 border-indigo-500 pl-2">Executive Summary</h4>
+                    <p class="leading-relaxed" x-text="report?.sentiment_report"></p>
+                </div>
+                
+                <!-- Explanation -->
+                <div>
+                    <h4 class="text-cyan-300 font-semibold mb-2 border-l-2 border-cyan-500 pl-2">Prediction Reasoning</h4>
+                    <p class="leading-relaxed" x-text="report?.prediction_explanation"></p>
+                </div>
+                
+                <!-- Insights -->
+                <div class="bg-indigo-500/5 rounded-lg p-4 border border-indigo-500/20">
+                    <h4 class="text-emerald-400 font-semibold mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Key Strategic Insights
+                    </h4>
+                    <p class="leading-relaxed whitespace-pre-wrap" x-text="report?.insights"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Word Cloud Area (Simulated) -->
+        <div class="glass-card p-6 mb-6">
+            <h4 class="text-lg font-semibold text-white mb-4">Topic Intelligence</h4>
+            <div class="flex flex-wrap gap-4 items-center justify-center p-8 bg-slate-900/50 rounded-xl border border-slate-700/50 min-h-[200px]">
+                <span class="text-4xl font-bold text-emerald-400 hover:scale-110 transition-transform cursor-default glow-effect">Policy</span>
+                <span class="text-2xl text-indigo-300 hover:scale-110 transition-transform cursor-default">Feedback</span>
+                <span class="text-xl text-rose-400 hover:scale-110 transition-transform cursor-default">Delay</span>
+                <span class="text-3xl font-bold text-cyan-400 hover:scale-110 transition-transform cursor-default glow-effect">Innovation</span>
+                <span class="text-lg text-slate-400 hover:scale-110 transition-transform cursor-default">Public</span>
+                <span class="text-sm text-amber-400 hover:scale-110 transition-transform cursor-default">Budget</span>
+                <span class="text-2xl font-semibold text-purple-400 hover:scale-110 transition-transform cursor-default">Development</span>
+                <span class="text-5xl font-extrabold text-white hover:scale-110 transition-transform cursor-default glow-effect">Growth</span>
+                <span class="text-xl text-emerald-300 hover:scale-110 transition-transform cursor-default">Support</span>
+                <span class="text-md text-slate-500 hover:scale-110 transition-transform cursor-default">Process</span>
+            </div>
+        </div>
+
+        <!-- Data Table snippet -->
+        <div class="glass-card p-6 overflow-x-auto">
+            <h4 class="text-lg font-semibold text-white mb-4">Sample Results</h4>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-700 text-sm font-medium text-slate-400">
+                        <th class="pb-3 pr-4">Text</th>
+                        <th class="pb-3 px-4">Sentiment</th>
+                        <th class="pb-3 px-4">Confidence</th>
+                        <th class="pb-3 pl-4">Model</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-for="item in results.slice(0, 5)" :key="item.text">
+                        <tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 pr-4 text-sm text-slate-300 truncate max-w-xs" x-text="item.text"></td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-1 rounded text-xs font-semibold capitalize" 
+                                      :class="{
+                                          'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': item.prediction === 'positive',
+                                          'bg-rose-500/10 text-rose-400 border border-rose-500/20': item.prediction === 'negative',
+                                          'bg-slate-500/10 text-slate-400 border border-slate-500/20': item.prediction === 'neutral'
+                                      }" x-text="item.prediction"></span>
+                            </td>
+                            <td class="py-3 px-4 text-sm font-mono text-cyan-400" x-text="(item.confidence * 100).toFixed(1) + '%'"></td>
+                            <td class="py-3 pl-4 text-xs text-indigo-300" x-text="item.model_used"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('csvApp', () => ({
+        isDragging: false,
+        isUploading: false,
+        error: null,
+        hasResults: false,
+        results: [],
+        report: null,
+        stats: {
+            total: 0,
+            positivePercent: 0,
+            negativePercent: 0,
+            avgConfidence: 0
+        },
+        
+        handleDrop(e) {
+            this.isDragging = false;
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                this.uploadFile(e.dataTransfer.files[0]);
+            }
+        },
+        
+        handleFileSelect(e) {
+            if (e.target.files && e.target.files.length > 0) {
+                this.uploadFile(e.target.files[0]);
+            }
+        },
+        
+        async uploadFile(file) {
+            if(!file.name.endsWith('.csv')) {
+                this.error = "Only CSV files are allowed.";
+                return;
+            }
+            
+            this.isUploading = true;
+            this.error = null;
+            this.hasResults = false;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/upload_csv', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if(!response.ok) {
+                    const err = await response.json().catch(()=>({}));
+                    throw new Error(err.detail || 'Failed to process CSV');
+                }
+                
+                const data = await response.json();
+                this.results = data.results;
+                this.report = data.report;
+                this.calculateStats();
+                this.hasResults = true;
+                
+                // Initialize charts
+                this.$nextTick(() => {
+                    this.initCharts();
+                });
+                
+            } catch(e) {
+                this.error = e.message;
+            } finally {
+                this.isUploading = false;
+            }
+        },
+        
+        calculateStats() {
+            this.stats.total = this.results.length;
+            if(this.stats.total === 0) return;
+            
+            let pos = 0, neg = 0, confSum = 0;
+            this.results.forEach(r => {
+                if(r.prediction === 'positive') pos++;
+                if(r.prediction === 'negative') neg++;
+                confSum += r.confidence;
+            });
+            
+            this.stats.positivePercent = ((pos / this.stats.total) * 100).toFixed(1);
+            this.stats.negativePercent = ((neg / this.stats.total) * 100).toFixed(1);
+            this.stats.avgConfidence = ((confSum / this.stats.total) * 100).toFixed(1);
+        },
+        
+        initCharts() {
+            // Setup ECharts for Sentiment
+            const sentimentChartDom = document.getElementById('sentimentChart');
+            if(sentimentChartDom) {
+                const myChart = echarts.init(sentimentChartDom);
+                let pos = 0, neg = 0, neu = 0;
+                this.results.forEach(r => {
+                    if(r.prediction === 'positive') pos++;
+                    else if(r.prediction === 'negative') neg++;
+                    else neu++;
+                });
+                
+                myChart.setOption({
+                    backgroundColor: 'transparent',
+                    tooltip: { trigger: 'item' },
+                    series: [{
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#111827',
+                            borderWidth: 2
+                        },
+                        label: { show: false },
+                        data: [
+                            { value: pos, name: 'Positive', itemStyle: { color: '#10b981' } },
+                            { value: neg, name: 'Negative', itemStyle: { color: '#f43f5e' } },
+                            { value: neu, name: 'Neutral', itemStyle: { color: '#64748b' } }
+                        ]
+                    }]
+                });
+            }
+            
+            // Setup Chart.js for Confidence
+            const ctx = document.getElementById('confidenceChart');
+            if(ctx) {
+                // Group into buckets
+                const buckets = {'<0.5':0, '0.5-0.7':0, '0.7-0.9':0, '>0.9':0};
+                this.results.forEach(r => {
+                    if(r.confidence < 0.5) buckets['<0.5']++;
+                    else if(r.confidence < 0.7) buckets['0.5-0.7']++;
+                    else if(r.confidence < 0.9) buckets['0.7-0.9']++;
+                    else buckets['>0.9']++;
+                });
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(buckets),
+                        datasets: [{
+                            label: 'Confidence Count',
+                            data: Object.values(buckets),
+                            backgroundColor: '#06b6d4',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
+                            x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                        }
+                    }
+                });
+            }
+        }
+    }));
+});
+</script>
+{% endblock %}

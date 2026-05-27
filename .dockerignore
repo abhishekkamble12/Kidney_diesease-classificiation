@@ -1,0 +1,10 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.env
+artifacts/data_ingestion
+artifacts/data_validation
+Kidney_diesease-classificiation

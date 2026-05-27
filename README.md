@@ -1,102 +1,63 @@
-# Tweet Sentiment Classification & MLOps Pipeline
+# AI-Native Sentiment Intelligence Platform
 
-This repository implements a production-grade, end-to-end Machine Learning pipeline for **3-Class Tweet Sentiment Classification** (Negative = `-1.0`, Neutral = `0.0`, Positive = `1.0`).
+A production-grade, full-stack AI analytics platform designed to classify public feedback sentiments and run detailed LangChain-driven search and report analysis.
 
-The architecture follows strict MLOps principles, utilizing **MLflow** and **DagsHub** for independent experiment tracking, per-model parameter logging, automated confusion matrix logging, local performance ledgers, and dynamic model comparisons.
+## Architecture
 
----
+This project provides a robust backend paired with an enterprise-grade, lightweight frontend. It uses a multi-tiered approach to ensure minimal latency, utilizing local ML models (LinearSVC, DistilBERT) in an ensemble setup to guarantee accurate predictions without relying on third-party cloud APIs.
 
-## 🚀 Key Features
+### Frontend
+- **Tech Stack**: FastAPI Templates, Jinja2, Tailwind CSS, Alpine.js, Chart.js, ECharts, HTMX.
+- **Design Language**: Dark theme, glassmorphism, responsive, and highly interactive.
+- **Key Modules**:
+  - **Predict Dashboard**: Real-time sentiment prediction with ChatGPT-style explanations.
+  - **Search Analysis**: AI-powered dynamic search aggregation and sentiment analysis.
+  - **Bulk CSV Analysis**: Drag-and-drop file processing with immediate charting insights.
+  - **Monitoring & Analytics**: Enterprise-level metrics visualization (latencies, confidence drift, model fallback rates).
 
-* **Multi-Model Support**: Dynamically train and compare multiple machine learning and deep learning architectures:
-  * **Logistic Regression + TF-IDF** (High-speed baseline)
-  * **Linear Support Vector Machine (LinearSVC) + TF-IDF** (Max-margin classifier)
-  * **Multinomial Naive Bayes + TF-IDF** (Probabilistic classifier)
-  * **Random Forest + TF-IDF** (Ensemble baseline)
-  * **XGBoost + TF-IDF** (Gradient-boosted decision trees)
-  * **Global Pooling FFN** (Keras-based Deep Learning Feed-Forward Network)
-  * **DistilBERT** (Hugging Face Contextual Transformer)
-* **Isolated Experiment Tracking**: Every model trained is registered inside its own independent, named MLflow run (e.g. `Run_LogisticRegression`), preventing overwrites.
-* **Per-Model Parameter & Metrics Logging**: Common and model-specific hyperparameters are logged dynamically from `params.yaml`, alongside macro/weighted metrics.
-* **Visual Evaluation Artifacts**: Automatically generates and logs a **Confusion Matrix Heatmap** (`.png`) and a **Classification Report** (`.txt`) for each model straight into MLflow.
-* **Consolidated Local Ledger**: Automatically appends and contrasts results locally in `artifacts/model_evaluation/all_models_summary.csv` for fast offline comparisons.
-* **Optimized Execution Engine**: Uses lazy imports and smart subsampling to guarantee the pipeline runs quickly and smoothly on standard CPU hardware without OOM risks.
-* **Continuous Integration**: Correct, cross-platform GitHub Actions CI workflow to test pipeline compilation and execution on every push.
+### Backend
+- **Langchain Search & Reports**: Utilizes DuckDuckGo (and RSS) for high-availability searching, aggregating public feedback dynamically.
+- **PostgreSQL Persistence**: Captures complete system observability metrics (latency, fallback indicators, inference distribution).
+- **MLflow & DagsHub**: Fully integrated for experiment tracking and model monitoring.
 
----
+## Run Instructions
 
-## 📁 Repository Structure
+### Prerequisites
+- Python 3.10+ or Docker.
+- A valid PostgreSQL database connection URL.
+- API Keys: LangChain, Groq, and Hugging Face.
 
-```text
-├── .github/workflows/   # GitHub Actions CI workflow (github-actions.yml)
-├── config/              # Root-level configuration yaml files
-├── research/            # Jupyter Notebooks for exploration
-├── src/                 # Main modular python package
-│   └── kidney_disease_classfication/
-│       ├── components/  # Core modular stages (Ingestion, Transformation, Trainer, Evaluator)
-│       ├── config/      # Dataclasses and Configuration Managers
-│       ├── constants/   # Path definitions
-│       └── utils/       # Common helper utilities
-├── .env                 # Environment variables for DagsHub credentials
-├── main.py              # Main execution entry-point orchestrator
-├── params.yaml          # Hyperparameters and model selection
-├── requirements.txt     # Python dependency configuration
-└── setup.py             # Package distribution configuration
+### Running Locally (Python)
+
+1. **Install Dependencies**
+```bash
+pip install -r requirements.txt
 ```
 
----
+2. **Environment Configuration**
+Create a `.env` file in the root directory:
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/tweet_sentiment
+GROQ_API_KEY=your_groq_api_key
+HF_API_TOKEN=your_hugging_face_token
+```
 
-## 🛠️ Installation & Setup
+3. **Start the Platform**
+```bash
+python app.py
+```
+*The platform UI and API will be available at http://localhost:8000*
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/abhishekkamble12/Kidney_diesease-classificiation.git
-   cd Kidney_diesease-classificiation
-   ```
+### Running via Docker
+The provided `Dockerfile` creates a highly optimized layer capable of executing the entire multi-model pipeline.
+```bash
+docker build -t tweet-sentiment-platform .
+docker run -d -p 8000:8000 --env-file .env tweet-sentiment-platform
+```
 
-2. **Set Up Python Virtual Environment**:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate  # Windows
-   source .venv/bin/activate  # macOS/Linux
-   ```
-
-3. **Install Dependencies**:
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-4. **Configure MLflow DagsHub Credentials**:
-   Open the `.env` file at the root and provide your actual DagsHub password/token:
-   ```env
-   MLFLOW_TRACKING_URI=https://dagshub.com/abhishekkamble12/Kidney_diesease-classificiation.mlflow
-   MLFLOW_TRACKING_USERNAME=abhishekkamble12
-   MLFLOW_TRACKING_PASSWORD=YOUR_ACTUAL_DAGSHUB_TOKEN_OR_PASSWORD
-   ```
-
----
-
-## 📈 Running the Pipeline
-
-1. **Configure Hyperparameters**:
-   Modify [params.yaml](params.yaml) to select which models to train and customize their parameters:
-   ```yaml
-   models_to_train:
-     - LogisticRegression
-     - SVM
-     - MultinomialNB
-     - RandomForest
-     - XGBoost
-     - GlobalPoolingFFN
-     - DistilBERT
-   ```
-
-2. **Execute the End-to-End Pipeline**:
-   ```bash
-   python main.py
-   ```
-
-3. **Analyze Results**:
-   * **In the Cloud**: Go to your DagsHub repository's **Experiments** tab to see your separate model runs side-by-side! Compare accuracy, hyperparameters, and view confusion matrix plots.
-   * **Locally**: Open the automatically generated CSV summary table at `artifacts/model_evaluation/all_models_summary.csv`.
+## Dependencies Overview
+- **FastAPI / Uvicorn**: High-performance asynchronous API framework and server, alongside Jinja2 templates.
+- **Transformers / Scikit-Learn**: Hybrid ML pipeline providing sub-100ms inference locally.
+- **Langchain**: Agent orchestration and high-speed search aggregation.
+- **SQLAlchemy / Alembic**: Database abstraction and schema migration support.
+- **TailwindCSS / Alpine.js**: Lightweight styling and frontend reactivity.

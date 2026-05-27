@@ -3,7 +3,7 @@ from pathlib import Path
 import logging
 
 # project name 
-project_name = "kidney_disease_classfication"
+project_name = "tweet_sentiment_classifier"
 
 list_of_files = [
     f"src/{project_name}/__init__.py",

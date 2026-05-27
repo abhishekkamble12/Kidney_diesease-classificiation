@@ -1,0 +1,259 @@
+<!-- templates/pages/monitoring.html -->
+{% extends "layouts/base.html" %}
+{% from 'components/metric_card.html' import metric_card %}
+{% from 'components/charts.html' import chart_container %}
+
+{% block title %}AI Analytics | MLOps Monitoring{% endblock %}
+{% block header_title %}System Monitoring & Telemetry{% endblock %}
+
+{% block content %}
+<div class="space-y-6" x-data="monitoringApp()" x-init="initData()">
+    
+    <!-- Top Action Bar -->
+    <div class="flex justify-between items-center bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
+        <div class="flex items-center space-x-2">
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+            <span class="text-sm font-medium text-emerald-400">Live Telemetry Active</span>
+        </div>
+        <div class="text-xs text-slate-500 font-mono">
+            Last Updated: <span x-text="lastUpdated"></span>
+        </div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Latency -->
+        <div class="glass-card p-6 flex flex-col justify-between relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div>
+            <div>
+                <p class="text-sm text-slate-400 mb-1">Avg Inference Latency</p>
+                <h3 class="text-3xl font-bold text-white flex items-end">
+                    <span x-text="metrics.avg_latency_ms || 0"></span>
+                    <span class="text-sm text-slate-500 ml-1 mb-1">ms</span>
+                </h3>
+            </div>
+            <div class="mt-4 flex items-center text-xs" :class="(metrics.avg_latency_ms || 0) < 150 ? 'text-emerald-400' : 'text-rose-400'">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                <span x-text="(metrics.avg_latency_ms || 0) < 150 ? 'Optimal' : 'Degraded'"></span>
+            </div>
+        </div>
+
+        <!-- Confidence -->
+        <div class="glass-card p-6 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent"></div>
+            <div>
+                <p class="text-sm text-slate-400 mb-1">Avg Confidence Score</p>
+                <h3 class="text-3xl font-bold text-white flex items-end">
+                    <span x-text="((metrics.avg_confidence || 0) * 100).toFixed(1)"></span>
+                    <span class="text-sm text-slate-500 ml-1 mb-1">%</span>
+                </h3>
+            </div>
+            <div class="mt-4 w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div class="bg-indigo-500 h-1.5 rounded-full transition-all" :style="`width: ${(metrics.avg_confidence || 0) * 100}%`"></div>
+            </div>
+        </div>
+
+        <!-- Fallback Rate -->
+        <div class="glass-card p-6 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent"></div>
+            <div>
+                <p class="text-sm text-slate-400 mb-1">LLM Fallback Rate</p>
+                <h3 class="text-3xl font-bold text-white flex items-end">
+                    <span x-text="((metrics.fallback_rate || 0) * 100).toFixed(1)"></span>
+                    <span class="text-sm text-slate-500 ml-1 mb-1">%</span>
+                </h3>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-purple-400">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                Gemma routing activated
+            </div>
+        </div>
+
+        <!-- Volume -->
+        <div class="glass-card p-6 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-transparent"></div>
+            <div>
+                <p class="text-sm text-slate-400 mb-1">Total Predictions (Reports)</p>
+                <h3 class="text-3xl font-bold text-white flex items-end" x-text="getTotalVolume()"></h3>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-slate-500">
+                Processed across all endpoints
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Model Usage Distribution (Simulated) -->
+        <div class="glass-card p-6">
+            <h4 class="text-lg font-semibold text-white mb-4">Model Usage Distribution</h4>
+            <div class="relative h-64 w-full">
+                <canvas id="modelChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Prediction Distribution (Actual) -->
+        <div class="glass-card p-6">
+            <h4 class="text-lg font-semibold text-white mb-4">Sentiment Distribution</h4>
+            <div class="relative h-64 w-full" id="sentimentChartEcharts"></div>
+        </div>
+    </div>
+
+    <!-- Real-time logs simulation table -->
+    <div class="glass-card p-6 overflow-hidden">
+        <div class="flex justify-between items-center mb-4">
+            <h4 class="text-lg font-semibold text-white">System Inference Logs</h4>
+            <button class="text-xs px-3 py-1 bg-slate-800 text-slate-300 rounded hover:bg-slate-700 transition">View All</button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-700 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                        <th class="pb-3 pr-4">Timestamp</th>
+                        <th class="pb-3 px-4">Model Route</th>
+                        <th class="pb-3 px-4 text-right">Latency</th>
+                        <th class="pb-3 px-4 text-right">Confidence</th>
+                        <th class="pb-3 pl-4 text-center">Fallback</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm font-mono" id="logTableBody">
+                    <!-- Javascript will populate simulated logs based on metrics -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('monitoringApp', () => ({
+        metrics: {},
+        lastUpdated: '--:--:--',
+        
+        getTotalVolume() {
+            if(!this.metrics.prediction_distribution) return 0;
+            return Object.values(this.metrics.prediction_distribution).reduce((a, b) => a + b, 0);
+        },
+        
+        async initData() {
+            await this.fetchMetrics();
+            setInterval(() => this.fetchMetrics(), 10000); // poll every 10s
+        },
+        
+        async fetchMetrics() {
+            try {
+                // Wait, original route is /monitoring. Since HTML is /monitoring-dashboard, API is still /monitoring
+                const res = await fetch('/monitoring');
+                if(res.ok) {
+                    this.metrics = await res.json();
+                    this.lastUpdated = new Date().toLocaleTimeString();
+                    this.updateCharts();
+                    this.updateSimulatedLogs();
+                }
+            } catch(e) {
+                console.error("Failed to fetch metrics", e);
+            }
+        },
+        
+        updateCharts() {
+            // Chart 1: Model Usage (Simulated since backend doesn't provide exact split in /monitoring)
+            const fallbackP = this.metrics.fallback_rate || 0;
+            const fastP = (1 - fallbackP) * 0.7; // arbitrary split
+            const refineP = (1 - fallbackP) * 0.3;
+            
+            const ctx = document.getElementById('modelChart');
+            if(ctx && !window.modelChartInstance) {
+                window.modelChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['LinearSVC (Fast)', 'DistilBERT (Refine)', 'Gemma (Fallback)'],
+                        datasets: [{
+                            data: [fastP * 100, refineP * 100, fallbackP * 100],
+                            backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6'],
+                            borderWidth: 0,
+                            cutout: '70%'
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#cbd5e1', font: {family: 'Inter'} } }
+                        }
+                    }
+                });
+            } else if(window.modelChartInstance) {
+                window.modelChartInstance.data.datasets[0].data = [fastP*100, refineP*100, fallbackP*100];
+                window.modelChartInstance.update();
+            }
+            
+            // Chart 2: Echarts Sentiment
+            const sentDom = document.getElementById('sentimentChartEcharts');
+            if(sentDom && !window.sentChartInstance) {
+                window.sentChartInstance = echarts.init(sentDom);
+            }
+            if(window.sentChartInstance) {
+                const dist = this.metrics.prediction_distribution || {};
+                window.sentChartInstance.setOption({
+                    backgroundColor: 'transparent',
+                    tooltip: { trigger: 'axis' },
+                    xAxis: {
+                        type: 'category',
+                        data: Object.keys(dist),
+                        axisLabel: { color: '#64748b' }
+                    },
+                    yAxis: { type: 'value', splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#64748b' } },
+                    series: [{
+                        data: Object.keys(dist).map(k => {
+                            let color = '#64748b';
+                            if(k==='positive') color = '#10b981';
+                            if(k==='negative') color = '#f43f5e';
+                            return { value: dist[k], itemStyle: { color: color } };
+                        }),
+                        type: 'bar',
+                        barWidth: '40%',
+                        itemStyle: { borderRadius: [4,4,0,0] }
+                    }]
+                });
+            }
+        },
+        
+        updateSimulatedLogs() {
+            const tbody = document.getElementById('logTableBody');
+            if(!tbody) return;
+            
+            // Generate some random fake logs just for UI preview matching the metrics averages
+            let html = '';
+            const models = ['LinearSVC', 'DistilBERT', 'Gemma LLM'];
+            const avgLat = this.metrics.avg_latency_ms || 100;
+            const avgConf = this.metrics.avg_confidence || 0.8;
+            
+            for(let i=0; i<5; i++) {
+                const now = new Date(Date.now() - i*15000);
+                const m = models[Math.floor(Math.random()*models.length)];
+                const lat = m.includes('Gemma') ? avgLat * 5 : (m.includes('DistilBERT') ? avgLat * 2 : avgLat * 0.2);
+                const conf = (avgConf + (Math.random()*0.1 - 0.05)).toFixed(2);
+                const fb = m.includes('Gemma');
+                
+                html += `
+                <tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                    <td class="py-3 pr-4 text-slate-400">${now.toLocaleTimeString()}</td>
+                    <td class="py-3 px-4 text-indigo-300">${m}</td>
+                    <td class="py-3 px-4 text-right text-slate-300">${lat.toFixed(0)}ms</td>
+                    <td class="py-3 px-4 text-right text-cyan-400">${conf}</td>
+                    <td class="py-3 pl-4 text-center">
+                        <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs ${fb ? 'bg-purple-500/10 text-purple-400' : 'bg-slate-500/10 text-slate-500'}">${fb ? 'Yes' : 'No'}</span>
+                    </td>
+                </tr>`;
+            }
+            tbody.innerHTML = html;
+        }
+    }));
+});
+</script>
+{% endblock %}

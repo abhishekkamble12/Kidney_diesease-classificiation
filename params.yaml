@@ -1,11 +1,10 @@
 # Active models to train and evaluate in the pipeline
 models_to_train:
   - LogisticRegression
-  - SVM
+  - LinearSVC
   - MultinomialNB
   - RidgeClassifier
   - XGBoost
-  - GlobalPoolingFFN
   - DistilBERT
 
 # Shared global configurations
@@ -16,30 +15,23 @@ max_features: 15000
 LogisticRegression:
   C: 1.0
   solver: "lbfgs"
-  max_iter: 50
+  max_iter: 100
 
-SVM:
+LinearSVC:
   C: 1.0
   loss: "squared_hinge"
   max_iter: 1000
 
 MultinomialNB:
-  alpha: 1.0
+  alpha: 0.1
 
 RidgeClassifier:
   alpha: 1.0
 
 XGBoost:
-  n_estimators: 50
-  max_depth: 4
-  learning_rate: 0.1
-
-GlobalPoolingFFN:
-  epochs: 1
-  batch_size: 64
-  learning_rate: 0.001
-  embedding_dim: 128
-  max_len: 128
+  n_estimators: 80
+  max_depth: 5
+  learning_rate: 0.15
 
 DistilBERT:
   epochs: 1

@@ -1,0 +1,79 @@
+/* static/css/style.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-300 antialiased overflow-x-hidden;
+    /* #0B1120 is very close to slate-900, let's just use custom variables for strict precision */
+    background-color: #0B1120;
+    color: #cbd5e1;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-[#111827]/80 backdrop-blur-md border border-slate-800 rounded-2xl shadow-xl transition-all duration-300;
+  }
+  
+  .glass-card:hover {
+    @apply border-slate-700 shadow-2xl shadow-indigo-500/10;
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 rounded-lg font-medium bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 transform hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-lg font-medium bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition-all duration-300;
+  }
+  
+  .ai-input {
+    @apply w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all duration-300;
+  }
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400;
+}
+
+.glow-effect {
+  position: relative;
+}
+
+.glow-effect::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  background: linear-gradient(45deg, #6366f1, #06b6d4, #10b981);
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glow-effect:hover::before {
+  opacity: 0.5;
+  filter: blur(8px);
+}
+
+/* Typing effect cursor */
+.typing-cursor::after {
+  content: '|';
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}

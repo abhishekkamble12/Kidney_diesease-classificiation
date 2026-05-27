@@ -7,7 +7,7 @@ __version__ = "0.0.0"
 
 REPO_NAME = "Kidney_diesease-classificiation"
 AUTHOR_USER_NAME = "abhishekkamble12"
-SRC_REPO = "kidney_disease_classfication"
+SRC_REPO = "tweet_sentiment_classifier"
 AUTHOR_EMAIL = "abhishekkamble@gmail.com"
 
 setuptools.setup(

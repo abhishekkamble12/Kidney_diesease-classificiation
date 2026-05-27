@@ -1,0 +1,151 @@
+<!-- templates/pages/landing.html -->
+{% extends "layouts/base.html" %}
+
+{% block title %}AI Analytics | Home{% endblock %}
+{% block header_title %}Home{% endblock %}
+
+{% block content %}
+<div class="space-y-12 pb-12">
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden rounded-3xl glass-card border border-indigo-500/20">
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-background to-cyan-500/10 z-0"></div>
+        
+        <!-- Floating Particles (CSS Animation) -->
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl animate-float" style="animation-delay: -3s;"></div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
+            <div class="inline-flex items-center px-4 py-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-sm font-medium mb-8">
+                <span class="flex h-2 w-2 rounded-full bg-indigo-400 mr-2 animate-pulse"></span>
+                Next-Gen AI Pipeline v2.0 Live
+            </div>
+            
+            <h1 class="text-5xl lg:text-7xl font-extrabold text-white tracking-tight mb-6">
+                AI-Native Sentiment <br/>
+                <span class="gradient-text">Intelligence Platform</span>
+            </h1>
+            
+            <p class="mt-4 text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+                Empower your decision-making with real-time public feedback intelligence, policy impact analysis, and predictive sentiment analytics driven by hybrid AI models.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="/predict-ui" class="btn-primary w-full sm:w-auto text-center flex items-center justify-center">
+                    Analyze Text
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+                <a href="/csv-analysis" class="btn-secondary w-full sm:w-auto text-center">
+                    Upload CSV
+                </a>
+                <a href="/search-analysis-ui" class="btn-secondary w-full sm:w-auto text-center border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10">
+                    AI Search Analysis
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE ARCHITECTURE FLOW SECTION -->
+    <section class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-white mb-4">Tiered Inference Architecture</h2>
+            <p class="text-slate-400">Sub-100ms latency via local DistilBERT with Gemma LLM Fallback.</p>
+        </div>
+
+        <div class="glass-card p-8 relative overflow-hidden">
+            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiMzMzMiLz48L3N2Zz4=')] opacity-20 z-0"></div>
+            
+            <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                
+                <div class="flex-1 text-center group cursor-default">
+                    <div class="w-20 h-20 mx-auto bg-slate-800 rounded-2xl border border-slate-700 flex items-center justify-center shadow-lg group-hover:border-indigo-500 group-hover:shadow-indigo-500/20 transition-all">
+                        <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <h3 class="mt-4 font-semibold text-white">Fast Model</h3>
+                    <p class="text-xs text-slate-500 mt-1">LinearSVC <br/> <span class="text-emerald-400">~15ms</span></p>
+                </div>
+
+                <div class="hidden lg:block text-slate-600">
+                    <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+                <!-- Mobile arrow -->
+                <div class="lg:hidden text-slate-600">
+                    <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </div>
+
+                <div class="flex-1 text-center group cursor-default">
+                    <div class="w-20 h-20 mx-auto bg-slate-800 rounded-2xl border border-slate-700 flex items-center justify-center shadow-lg group-hover:border-cyan-500 group-hover:shadow-cyan-500/20 transition-all relative">
+                        <div class="absolute -top-2 -right-2 bg-slate-700 text-[10px] px-2 py-1 rounded-full text-slate-300 border border-slate-600">Route</div>
+                        <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    </div>
+                    <h3 class="mt-4 font-semibold text-white">Confidence Router</h3>
+                    <p class="text-xs text-slate-500 mt-1">Threshold: 0.75</p>
+                </div>
+
+                <div class="hidden lg:block text-slate-600">
+                    <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+                <div class="lg:hidden text-slate-600">
+                    <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </div>
+
+                <div class="flex-1 text-center group cursor-default">
+                    <div class="w-20 h-20 mx-auto bg-slate-800 rounded-2xl border border-slate-700 flex items-center justify-center shadow-lg group-hover:border-purple-500 group-hover:shadow-purple-500/20 transition-all">
+                        <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h3 class="mt-4 font-semibold text-white">Refinement / Fallback</h3>
+                    <p class="text-xs text-slate-500 mt-1">DistilBERT &amp; Gemma LLM</p>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="max-w-7xl mx-auto px-4 mt-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div class="glass-card p-6 group cursor-default hover:border-indigo-500/50">
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <h4 class="text-lg font-bold text-white mb-2">Real-time Analytics</h4>
+                <p class="text-slate-400 text-sm">Instantly process public feedback and view dynamic dashboards with latencies tracked at every tier.</p>
+            </div>
+
+            <div class="glass-card p-6 group cursor-default hover:border-cyan-500/50">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-4 border border-cyan-500/20 group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <h4 class="text-lg font-bold text-white mb-2">Hybrid AI Search</h4>
+                <p class="text-slate-400 text-sm">Query live public sentiment on any topic (via DuckDuckGo) and get generative reports synthesized by LLMs.</p>
+            </div>
+
+            <div class="glass-card p-6 group cursor-default hover:border-emerald-500/50">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+                <h4 class="text-lg font-bold text-white mb-2">AI-Generated Reports</h4>
+                <p class="text-slate-400 text-sm">Transform unstructured text into policy insights and summaries leveraging LangChain and Groq.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MODEL STACK SECTION -->
+    <section class="max-w-7xl mx-auto px-4 mt-16 text-center border-t border-slate-800 pt-12">
+        <p class="text-sm font-medium text-slate-500 mb-8 uppercase tracking-widest">Powered By Enterprise Tech Stack</p>
+        <div class="flex flex-wrap justify-center gap-6 opacity-70 hover:opacity-100 transition-opacity duration-500">
+            <span class="px-4 py-2 bg-slate-900 rounded-lg border border-slate-700 text-slate-300 font-semibold text-sm">LinearSVC</span>
+            <span class="px-4 py-2 bg-slate-900 rounded-lg border border-slate-700 text-slate-300 font-semibold text-sm">DistilBERT</span>
+            <span class="px-4 py-2 bg-slate-900 rounded-lg border border-slate-700 text-slate-300 font-semibold text-sm">Gemma</span>
+            <span class="px-4 py-2 bg-slate-900 rounded-lg border border-slate-700 text-slate-300 font-semibold text-sm">LangChain</span>
+            <span class="px-4 py-2 bg-slate-900 rounded-lg border border-slate-700 text-slate-300 font-semibold text-sm">Groq</span>
+            <span class="px-4 py-2 bg-slate-900 rounded-lg border border-slate-700 text-slate-300 font-semibold text-sm">MLflow</span>
+            <span class="px-4 py-2 bg-slate-900 rounded-lg border border-slate-700 text-slate-300 font-semibold text-sm">DagsHub</span>
+            <span class="px-4 py-2 bg-slate-900 rounded-lg border border-slate-700 text-slate-300 font-semibold text-sm">PostgreSQL</span>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+<!-- templates/pages/experiments.html -->
+{% extends "layouts/base.html" %}
+
+{% block title %}AI Analytics | Experiments{% endblock %}
+{% block header_title %}Model Tracking & Experiments{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center bg-slate-900/50 p-6 rounded-xl border border-slate-700/50">
+        <div>
+            <h2 class="text-xl font-bold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                MLflow / DagsHub Integration
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">Live tracking of model training, performance metrics, and artifacts.</p>
+        </div>
+        <div class="flex space-x-3">
+            <button class="btn-secondary text-sm">Sync DagsHub</button>
+            <button class="btn-primary text-sm">Open MLflow UI</button>
+        </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="glass-card overflow-hidden">
+        <div class="p-6 border-b border-slate-800">
+            <h3 class="text-lg font-semibold text-white">Model Leaderboard</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-slate-900/50">
+                    <tr>
+                        <th class="px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Run Name</th>
+                        <th class="px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Model Type</th>
+                        <th class="px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Accuracy</th>
+                        <th class="px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">F1 Score</th>
+                        <th class="px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Latency</th>
+                        <th class="px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/50">
+                    <tr class="hover:bg-slate-800/30 transition">
+                        <td class="px-6 py-4 flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>
+                            <span class="text-white font-medium">prod-distilbert-v2</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-indigo-300">DistilBERT</td>
+                        <td class="px-6 py-4 text-sm text-emerald-400 font-mono">0.912</td>
+                        <td class="px-6 py-4 text-sm text-slate-300 font-mono">0.895</td>
+                        <td class="px-6 py-4 text-sm text-slate-300 font-mono">85ms</td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="px-2 py-1 text-xs bg-emerald-500/10 text-emerald-400 rounded border border-emerald-500/20">Deployed</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-slate-800/30 transition">
+                        <td class="px-6 py-4 flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+                            <span class="text-slate-300">fast-linear-v1</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-indigo-300">LinearSVC</td>
+                        <td class="px-6 py-4 text-sm text-slate-300 font-mono">0.845</td>
+                        <td class="px-6 py-4 text-sm text-slate-300 font-mono">0.821</td>
+                        <td class="px-6 py-4 text-sm text-emerald-400 font-mono">15ms</td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="px-2 py-1 text-xs bg-blue-500/10 text-blue-400 rounded border border-blue-500/20">Router Active</span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-slate-800/30 transition opacity-60">
+                        <td class="px-6 py-4 flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-slate-500 mr-2"></span>
+                            <span class="text-slate-400">exp-roberta-base</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-indigo-300">RoBERTa</td>
+                        <td class="px-6 py-4 text-sm text-slate-400 font-mono">0.920</td>
+                        <td class="px-6 py-4 text-sm text-slate-400 font-mono">0.902</td>
+                        <td class="px-6 py-4 text-sm text-rose-400 font-mono">250ms</td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="px-2 py-1 text-xs bg-slate-800 text-slate-400 rounded border border-slate-700">Archived</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+<!-- templates/pages/analytics_dashboard.html -->
+{% extends "layouts/base.html" %}
+
+{% block title %}AI Analytics | Executive Dashboard{% endblock %}
+{% block header_title %}Executive Intelligence Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    
+    <!-- Top Filters -->
+    <div class="flex justify-between items-center glass-card p-4">
+        <div class="flex space-x-2">
+            <button class="px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-lg">Today</button>
+            <button class="px-4 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm font-medium rounded-lg transition">7 Days</button>
+            <button class="px-4 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm font-medium rounded-lg transition">30 Days</button>
+        </div>
+        <div>
+            <button class="px-4 py-2 border border-slate-700 text-slate-300 hover:text-white rounded-lg text-sm flex items-center transition">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                Advanced Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Key Metrics Column -->
+        <div class="space-y-6">
+            <div class="glass-card p-6 border-indigo-500/20">
+                <h4 class="text-sm text-slate-400 font-semibold uppercase tracking-wider mb-2">Total Insights Generated</h4>
+                <div class="flex items-baseline space-x-2">
+                    <span class="text-4xl font-extrabold text-white">24,592</span>
+                    <span class="text-sm text-emerald-400 font-medium flex items-center">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                        12.5%
+                    </span>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6 border-cyan-500/20">
+                <h4 class="text-sm text-slate-400 font-semibold uppercase tracking-wider mb-2">Public Sentiment Index</h4>
+                <div class="flex items-baseline space-x-2">
+                    <span class="text-4xl font-extrabold text-white">68.4</span>
+                    <span class="text-sm text-slate-500 font-medium">/ 100</span>
+                </div>
+                <div class="mt-4 w-full bg-slate-800 rounded-full h-1">
+                    <div class="bg-gradient-to-r from-cyan-500 to-emerald-500 h-1 rounded-full w-[68%]"></div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 border-rose-500/20">
+                <h4 class="text-sm text-slate-400 font-semibold uppercase tracking-wider mb-2">Critical Alerts</h4>
+                <div class="flex items-baseline space-x-2">
+                    <span class="text-4xl font-extrabold text-rose-400">3</span>
+                    <span class="text-sm text-slate-500 font-medium">unresolved issues</span>
+                </div>
+                <button class="mt-4 text-xs text-indigo-400 hover:text-indigo-300">View detailed reports &rarr;</button>
+            </div>
+        </div>
+
+        <!-- Main Chart Area -->
+        <div class="lg:col-span-2 glass-card p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <h4 class="text-lg font-semibold text-white">Sentiment Trends Over Time</h4>
+                <button class="text-slate-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></button>
+            </div>
+            <div class="flex-1 min-h-[300px] flex items-center justify-center bg-slate-900/50 rounded-xl border border-slate-700/50 relative overflow-hidden group">
+                <!-- Mock Chart Visual -->
+                <div class="absolute inset-0 opacity-50 flex items-end px-4 pt-8">
+                    <div class="w-1/6 h-[40%] bg-rose-500/20 rounded-t border-t border-rose-500/50 mx-1"></div>
+                    <div class="w-1/6 h-[60%] bg-emerald-500/20 rounded-t border-t border-emerald-500/50 mx-1"></div>
+                    <div class="w-1/6 h-[30%] bg-rose-500/20 rounded-t border-t border-rose-500/50 mx-1"></div>
+                    <div class="w-1/6 h-[80%] bg-emerald-500/20 rounded-t border-t border-emerald-500/50 mx-1"></div>
+                    <div class="w-1/6 h-[50%] bg-emerald-500/20 rounded-t border-t border-emerald-500/50 mx-1"></div>
+                    <div class="w-1/6 h-[90%] bg-emerald-500/20 rounded-t border-t border-emerald-500/50 mx-1"></div>
+                </div>
+                <span class="z-10 text-slate-500 font-medium group-hover:text-white transition">Interactive EChart loads here</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Summaries -->
+    <div class="glass-card p-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        <h4 class="text-lg font-semibold text-white mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-indigo-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Automated Executive Briefing
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+            <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-700">
+                <h5 class="text-sm font-bold text-emerald-400 mb-2">Positive Accelerators</h5>
+                <p class="text-sm text-slate-300 leading-relaxed">Public reception to the recent infrastructure announcements has driven a 15% surge in positive sentiment across major platforms. The term "innovation" is strongly correlated with these discussions.</p>
+            </div>
+            <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-700">
+                <h5 class="text-sm font-bold text-rose-400 mb-2">Risk Factors</h5>
+                <p class="text-sm text-slate-300 leading-relaxed">A growing negative cluster is forming around "service delays". While overall volume is low, the intensity (confidence scores > 90%) suggests immediate operational review is necessary.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

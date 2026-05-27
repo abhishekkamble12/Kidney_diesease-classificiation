@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tweet Sentiment Analyzer & AI Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-effects">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main class="glass-panel main-container">
+        <header class="header">
+            <h1>Sentiment<span class="gradient-text">AI</span></h1>
+            <p>Phase 6 Intelligence Dashboard</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-target="predict">Quick Predict</button>
+            <button class="tab-btn" data-target="search">AI Search</button>
+            <button class="tab-btn" data-target="monitoring">Monitoring</button>
+        </nav>
+
+        <section id="predict" class="tab-content active">
+            <div class="input-group">
+                <label for="predict-input">Analyze a single tweet or phrase</label>
+                <textarea id="predict-input" placeholder="e.g. I absolutely love this new update!"></textarea>
+                <button id="predict-btn" class="primary-btn">Analyze Sentiment</button>
+            </div>
+            <div id="predict-result" class="result-box hidden">
+                <div class="result-header">Result</div>
+                <div class="result-content" id="predict-content"></div>
+            </div>
+        </section>
+
+        <section id="search" class="tab-content">
+            <div class="input-group">
+                <label for="search-input">Run an AI-Native Search & Report Analysis</label>
+                <input type="text" id="search-input" placeholder="e.g. Latest tech news in AI">
+                <button id="search-btn" class="primary-btn">Generate Report</button>
+            </div>
+            <div id="search-result" class="result-box hidden">
+                <div class="result-header">Report Generated</div>
+                <div class="result-content" id="search-content"></div>
+            </div>
+        </section>
+
+        <section id="monitoring" class="tab-content">
+            <button id="refresh-monitoring-btn" class="secondary-btn">Refresh Stats</button>
+            <div class="monitoring-grid" id="monitoring-grid">
+                <!-- Populated via JS -->
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

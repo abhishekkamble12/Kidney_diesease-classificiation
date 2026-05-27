@@ -1,0 +1,15 @@
+<!-- templates/components/metric_card.html -->
+{% macro metric_card(title, value, icon_svg, color_class, subtitle="") %}
+<div class="glass-card p-6 flex items-center justify-between glow-effect">
+    <div>
+        <p class="text-sm font-medium text-slate-400 mb-1">{{ title }}</p>
+        <h3 class="text-3xl font-bold text-white tracking-tight">{{ value }}</h3>
+        {% if subtitle %}
+        <p class="text-xs text-slate-500 mt-2">{{ subtitle }}</p>
+        {% endif %}
+    </div>
+    <div class="p-4 rounded-full bg-slate-800/50 text-{{ color_class }}">
+        {{ icon_svg | safe }}
+    </div>
+</div>
+{% endmacro %}

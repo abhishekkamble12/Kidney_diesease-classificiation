@@ -1,0 +1,34 @@
+from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, JSON
+from datetime import datetime
+from tweet_sentiment_classifier.config.database import Base
+
+class PredictionLog(Base):
+    __tablename__ = "prediction_logs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    latency_ms = Column(Float, nullable=False)
+    confidence = Column(Float, nullable=False)
+    model_used = Column(String, nullable=False)
+    prediction = Column(String, nullable=False)
+    text_length = Column(Integer, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+class ReportLog(Base):
+    __tablename__ = "reports"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    query = Column(String, nullable=False) # Only metadata
+    top_keywords = Column(JSON, nullable=True)
+    sentiment_distribution = Column(JSON, nullable=True)
+    fallback_used = Column(Boolean, default=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+class MonitoringMetric(Base):
+    __tablename__ = "monitoring_metrics"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    avg_latency = Column(Float, nullable=False)
+    avg_confidence = Column(Float, nullable=False)
+    fallback_rate = Column(Float, nullable=False)
+    prediction_distribution = Column(JSON, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)

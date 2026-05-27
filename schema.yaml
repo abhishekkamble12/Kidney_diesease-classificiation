@@ -1,0 +1,10 @@
+features:
+  - name: text
+    type: string
+
+target:
+  name: sentiment
+  classes:
+    - -1
+    - 0
+    - 1
