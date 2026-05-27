@@ -1,0 +1,20 @@
+tensorflow
+pandas
+numpy
+dvc
+mlflow
+matplotlib
+seaborn
+joblib
+types-PyYAML
+scipy
+gdown
+Fastapi
+ensure
+python-box
+scikit-learn
+dagshub
+python-dotenv
+transformers
+huggingface-hub
+-e .

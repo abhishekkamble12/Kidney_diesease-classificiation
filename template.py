@@ -32,6 +32,7 @@ list_of_files = [
     ".github/workflows/github-actions.yml",
     "config/config.yaml",
     "dvc.yaml",
+    "params.yaml"
     "templates/index.html",
     "setup.py",
     "research/trials.ipynb",

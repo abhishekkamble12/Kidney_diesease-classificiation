@@ -1,11 +1,21 @@
-tensorflow 
-pandas 
-numpy 
-dvc 
-mlflow 
+tensorflow
+pandas
+numpy
+dvc
+mlflow
 matplotlib
-seaborn 
+seaborn
 joblib
 types-PyYAML
 scipy
+gdown
 Fastapi
+ensure
+python-box
+scikit-learn
+dagshub
+python-dotenv
+transformers
+huggingface-hub
+transformers
+-e .
