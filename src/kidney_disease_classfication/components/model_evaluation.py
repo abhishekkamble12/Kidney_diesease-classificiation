@@ -114,11 +114,32 @@ class ModelEvaluation:
             }
             logger.info(f"Evaluation metrics computed: {metrics}")
 
-            # Save metrics locally as JSON
-            metrics_file_path = Path(self.config.metrics_file)
+            # Save metrics locally as a model-specific JSON file to prevent overwriting
+            metrics_dir = Path(self.config.metrics_file).parent
+            metrics_file_path = metrics_dir / f"metrics_{model_name}.json"
             os.makedirs(metrics_file_path.parent, exist_ok=True)
             save_json(path=metrics_file_path, data=metrics)
             logger.info(f"Saved evaluation metrics locally at {metrics_file_path}")
+
+            # Update a consolidated summary ledger for all trained models locally
+            summary_path = metrics_dir / "all_models_summary.csv"
+            new_row = {
+                "Timestamp": [pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")],
+                "Model Name": [model_name],
+                "Accuracy": [acc],
+                "F1 Score": [f1],
+                "Precision": [precision],
+                "Recall": [recall]
+            }
+            new_df = pd.DataFrame(new_row)
+            if summary_path.exists():
+                summary_df = pd.read_csv(summary_path)
+                summary_df = summary_df[summary_df["Model Name"] != model_name]
+                summary_df = pd.concat([summary_df, new_df], ignore_index=True)
+            else:
+                summary_df = new_df
+            summary_df.to_csv(summary_path, index=False)
+            logger.info(f"Updated all models summary ledger at {summary_path}")
 
             # MLflow/DagsHub Tracking Setup
             tracking_uri = os.getenv("MLFLOW_TRACKING_URI")
