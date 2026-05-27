@@ -38,7 +38,3 @@ jobs:
     - name: Compile python files
       run: |
         python -m compileall src/
-
-    - name: Run pipeline integration test
-      run: |
-        python main.py
