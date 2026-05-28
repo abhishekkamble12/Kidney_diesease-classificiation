@@ -16,10 +16,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install python dependencies first (leverage Docker cache)
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
+    sed -i '/-e \./d' requirements.txt && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . .
+
+# Install the project as a package
+RUN pip install -e .
 
 # Expose API port
 EXPOSE 8000
