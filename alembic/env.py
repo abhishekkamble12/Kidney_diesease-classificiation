@@ -18,8 +18,11 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
+from tweet_sentiment_classifier.config.env_config import get_settings
+
 def get_url():
-    return os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/tweet_sentiment")
+    settings = get_settings()
+    return settings.DATABASE_URL
 
 def run_migrations_offline() -> None:
     url = get_url()

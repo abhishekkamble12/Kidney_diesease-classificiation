@@ -8,7 +8,8 @@ from sklearn.svm import LinearSVC
 from sklearn.naive_bayes import MultinomialNB
 from tweet_sentiment_classifier import logger
 from tweet_sentiment_classifier.config.config_entity import ModelTrainerConfig
-
+import tensorflow as tf
+from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
 class ModelTrainer:
     def __init__(self, config: ModelTrainerConfig):
         self.config = config
@@ -91,16 +92,21 @@ class ModelTrainer:
 
                 logger.info("Initializing DistilBERT training (CPU Optimized)")
                 
-                # Limit samples for CPU speed
-                sample_size = min(100, len(train_df))
+                # Retrieve sample size from hyperparams or default to 500 for better quality
+                sample_size_param = hyperparams.get("sample_size", 500)
+                sample_size = min(sample_size_param, len(train_df))
                 logger.info(f"Sampling {sample_size} records for DistilBERT safely under hardware constraints")
                 sampled_train_df = train_df.sample(n=sample_size, random_state=random_state)
                 
                 X_train_str = sampled_train_df['text'].astype(str).tolist()
                 y_train_mapped_sampled = (sampled_train_df['sentiment'] + 1).astype(int).values
 
-                tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-                model = TFAutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels=3)
+                tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased", use_safetensors=False)
+                model = TFAutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels=3, use_safetensors=False)
+
+                # Freeze the DistilBERT backbone (Feature Extraction mode) for low-cost, fast training
+                logger.info("Freezing DistilBERT base model layers for high-efficiency feature extraction...")
+                model.layers[0].trainable = False
 
                 train_encodings = tokenizer(X_train_str, truncation=True, padding=True, max_length=hyperparams.get("max_len", 128), return_tensors="tf")
                 
@@ -115,7 +121,7 @@ class ModelTrainer:
                     metrics=['accuracy']
                 )
 
-                model.fit(train_dataset, epochs=hyperparams.get("epochs", 1))
+                model.fit(train_dataset, epochs=hyperparams.get("epochs", 5))
 
                 model.save_pretrained(str(model_path))
                 tokenizer.save_pretrained(str(model_path))

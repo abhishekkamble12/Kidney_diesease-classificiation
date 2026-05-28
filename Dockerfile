@@ -3,7 +3,8 @@ FROM python:3.10-slim
 # Set environment variables to optimize Python & memory
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    MALLOC_ARENA_MAX=2
+    MALLOC_ARENA_MAX=2 \
+    TF_USE_LEGACY_KERAS=1
 
 WORKDIR /app
 
@@ -23,10 +24,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 # Install the project as a package
-RUN pip install -e .
+RUN pip install .
 
 # Expose API port
 EXPOSE 8000
 
 # Run uvicorn with optimized workers & threads
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2", "--limit-concurrency", "50"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--limit-concurrency", "50"]

@@ -289,6 +289,146 @@ def get_monitoring(db: Session = Depends(get_db)):
         "prediction_distribution": dist
     }
 
+@app.get("/api/analytics")
+def get_analytics(db: Session = Depends(get_db)):
+    try:
+        import json
+        total_predictions = db.query(PredictionLog).count()
+        
+        avg_lat = db.query(func.avg(PredictionLog.latency_ms)).scalar() or 0.0
+        avg_conf = db.query(func.avg(PredictionLog.confidence)).scalar() or 0.0
+        
+        preds = db.query(PredictionLog.prediction, func.count(PredictionLog.id)).group_by(PredictionLog.prediction).all()
+        sentiment_dist = {str(p[0]): p[1] for p in preds}
+        
+        for key in ["positive", "neutral", "negative"]:
+            if key not in sentiment_dist:
+                sentiment_dist[key] = 0
+                
+        pos_count = sentiment_dist.get("positive", 0)
+        neg_count = sentiment_dist.get("negative", 0)
+        if total_predictions > 0:
+            sentiment_index = round(((pos_count - neg_count) / total_predictions) * 50 + 50, 1)
+        else:
+            sentiment_index = 50.0
+            
+        critical_alerts_count = db.query(PredictionLog).filter(PredictionLog.confidence < 0.6).count()
+        
+        trend_data = db.query(
+            func.strftime('%Y-%m-%d %H:00', PredictionLog.timestamp).label('hour'),
+            PredictionLog.prediction,
+            func.count(PredictionLog.id)
+        ).group_by('hour', PredictionLog.prediction).order_by('hour').all()
+        
+        trends = {}
+        for hour, pred, count in trend_data:
+            if not hour:
+                continue
+            if hour not in trends:
+                trends[hour] = {"positive": 0, "neutral": 0, "negative": 0}
+            trends[hour][pred] = count
+            
+        sorted_hours = sorted(trends.keys())[-10:]
+        trends_formatted = {
+            "categories": [h.split(" ")[1] if " " in h else h for h in sorted_hours],
+            "positive": [trends[h]["positive"] for h in sorted_hours],
+            "neutral": [trends[h]["neutral"] for h in sorted_hours],
+            "negative": [trends[h]["negative"] for h in sorted_hours]
+        }
+        
+        recent_reports = db.query(ReportLog).order_by(ReportLog.timestamp.desc()).limit(10).all()
+        all_keywords = []
+        for r in recent_reports:
+            if r.top_keywords:
+                if isinstance(r.top_keywords, list):
+                    all_keywords.extend(r.top_keywords)
+                elif isinstance(r.top_keywords, str):
+                    try:
+                        kws = json.loads(r.top_keywords)
+                        if isinstance(kws, list):
+                            all_keywords.extend(kws)
+                    except:
+                        pass
+        
+        kw_freq = {}
+        for kw in all_keywords:
+            if kw and len(kw.strip()) > 1:
+                kw_freq[kw] = kw_freq.get(kw, 0) + 1
+        sorted_kws = sorted(kw_freq.items(), key=lambda x: x[1], reverse=True)
+        top_kws = [kw[0] for kw in sorted_kws[:6]]
+        
+        if not top_kws:
+            top_kws = ["sentiment", "feedback", "latency", "confidence", "ensemble", "gemma"]
+            
+        return {
+            "total_insights": total_predictions,
+            "avg_latency_ms": round(avg_lat, 2),
+            "avg_confidence": round(avg_conf, 4),
+            "sentiment_index": sentiment_index,
+            "critical_alerts": critical_alerts_count,
+            "sentiment_distribution": sentiment_dist,
+            "trends": trends_formatted,
+            "top_keywords": top_kws
+        }
+    except Exception as e:
+        logger.error(f"Error serving /api/analytics: {e}")
+        return {
+            "total_insights": 0,
+            "avg_latency_ms": 0.0,
+            "avg_confidence": 0.0,
+            "sentiment_index": 50.0,
+            "critical_alerts": 0,
+            "sentiment_distribution": {"positive": 0, "neutral": 0, "negative": 0},
+            "trends": {"categories": [], "positive": [], "neutral": [], "negative": []},
+            "top_keywords": ["sentiment", "feedback", "latency", "confidence", "ensemble", "gemma"]
+        }
+
+@app.get("/api/experiments")
+def get_experiments():
+    from pathlib import Path
+    summary_path = Path("artifacts/model_evaluation/all_models_summary.csv")
+    if not summary_path.exists():
+        return {"experiments": []}
+    
+    try:
+        df = pd.read_csv(summary_path)
+        df = df.fillna({
+            "Accuracy": 0.0,
+            "F1 Score (Weighted)": 0.0,
+            "F1 Score (Macro)": 0.0,
+            "Precision (Weighted)": 0.0,
+            "Recall (Weighted)": 0.0,
+            "Latency": 0.0,
+            "Timestamp": ""
+        })
+        
+        experiments = []
+        for _, row in df.iterrows():
+            model_name = row.get("Model Name", "")
+            if model_name == "LinearSVC":
+                status = "Deployed (Tier 1)"
+            elif model_name == "DistilBERT":
+                status = "Deployed (Tier 2)"
+            elif model_name in ["LogisticRegression", "RidgeClassifier"]:
+                status = "Standby (Ensemble)"
+            else:
+                status = "Trained"
+                
+            experiments.append({
+                "timestamp": row.get("Timestamp", "") or row.get("timestamp", ""),
+                "model_name": model_name,
+                "accuracy": round(float(row.get("Accuracy", 0.0)), 4),
+                "f1_weighted": round(float(row.get("F1 Score (Weighted)", 0.0)), 4),
+                "f1_macro": round(float(row.get("F1 Score (Macro)", 0.0)), 4),
+                "latency_seconds": round(float(row.get("Latency", 0.0)), 4),
+                "status": status
+            })
+        return {"experiments": experiments}
+    except Exception as e:
+        logger.error(f"Error reading experiments: {e}")
+        return {"experiments": [], "error": str(e)}
+
+
 # Mount static files at the end to prevent route conflicts
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

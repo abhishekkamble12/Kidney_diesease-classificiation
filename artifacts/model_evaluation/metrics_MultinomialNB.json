@@ -2,5 +2,5 @@
     "accuracy": 0.7708710459301077,
     "f1_score_weighted": 0.7649847300886738,
     "f1_score_macro": 0.7470893932002111,
-    "latency_seconds": 1.5156354904174805
+    "latency_seconds": 1.6322193145751953
 }

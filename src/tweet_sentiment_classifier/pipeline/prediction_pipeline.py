@@ -70,8 +70,10 @@ class PredictionPipeline:
                 model_source = "distilbert-base-uncased-finetuned-sst-2-english"
                 logger.info(f"Local DistilBERT not found, downloading {model_source} from HF...")
             
-            self.db_tokenizer = AutoTokenizer.from_pretrained(model_source)
-            self.db_model = TFAutoModelForSequenceClassification.from_pretrained(model_source)
+            self.db_tokenizer = AutoTokenizer.from_pretrained(model_source, use_safetensors=False)
+            
+            # If loading local or fallback to HF, native TF weights should be used.
+            self.db_model = TFAutoModelForSequenceClassification.from_pretrained(model_source, use_safetensors=False)
         except Exception as e:
             self.db_tokenizer = None
             self.db_model = None

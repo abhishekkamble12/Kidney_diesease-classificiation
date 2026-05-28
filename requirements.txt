@@ -27,4 +27,7 @@ sqlalchemy
 alembic
 psycopg2-binary
 pydantic-settings
+mlflow
+matplotlib
+seaborn
 -e .
