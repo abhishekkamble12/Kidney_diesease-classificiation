@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # Set environment variables to optimize Python & memory
 ENV PYTHONDONTWRITEBYTECODE=1 \
